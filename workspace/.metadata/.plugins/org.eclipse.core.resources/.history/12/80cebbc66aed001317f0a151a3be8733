@@ -1,0 +1,340 @@
+package json;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import json.Database;
+
+public class Edxparser {
+    public static void main(String[] args) {
+    	
+    	/*
+    	JsonParser parser = new JsonParser();
+    	JsonElement jsonElement = parser.parse(new FileReader("/path/to/myfile"));
+    	JsonObject jsonObject = jsonElement.getAsJsonObject();
+    	*/
+    	
+        String jsonStr = "";
+        String jsonline[] = null;
+    	Database db = new Database();
+		try {
+			jsonStr = new Scanner(new File("/home/sachin/workspace/json/src/json/tracking2.log")).useDelimiter("\\Z").next();
+			jsonline = jsonStr.split("\n");
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			//system.out.println("file not found");
+		}
+        try {
+            for(int j=0;j<jsonline.length;j++)
+            {
+            	JSONObject rootObject = new JSONObject(jsonline[j]); // Parse the JSON to a JSONObject
+                Log log = new Log();
+            	
+            	//system.out.println("*****Value of the j is "+j+"\n");
+	            //Printing agent
+	            //system.out.println("Description of browser user was using:");
+	            //system.out.println("	"+rootObject.get("agent")+"\n");
+	            
+	            //printing context
+	            //system.out.println("Context was:");
+	            JSONObject context = rootObject.getJSONObject("context");
+	            //system.out.println("	course_id	:"+context.get("course_id"));
+	            log.setCourse_id(context.get("course_id").toString());											//2nd field
+	            //system.out.println("	org_id		:"+context.get("org_id"));
+	            log.setOrg_id(context.get("org_id").toString());												//4th field
+	            //system.out.println("	user_id		:"+context.get("user_id"));
+	            try
+	            {
+	            	log.setUser_id((Integer)context.get("user_id"));											//5th field
+	            }
+	            catch(Exception e)
+	            {
+	            	log.setUser_id(0);
+	            }
+	            //printing module
+	            try
+	            {
+		            //system.out.println("	Module was:");
+		            JSONObject module = context.getJSONObject("module");
+		            //system.out.println("		Display name	:"+module.get("display_name")+"\n");
+		            log.setModule(module.get("display_name").toString());											//3rd field
+	            }
+	            catch (Exception e)
+	            {
+	            	log.setModule("");	
+	            }
+	
+	            //printing event_source
+	            //system.out.println("Event Source:");
+	            //system.out.println("	"+rootObject.get("event_source")+"\n");
+	            log.setEvent_source(rootObject.get("event_source").toString());									//7th field
+	
+	            //printing event_type
+	            //system.out.println("Event Type:");
+	            //system.out.println("	"+rootObject.get("event_type")+"\n");
+	            log.setEvent_type(rootObject.get("event_type").toString());											//6th and 8th field
+	
+	            //printing host
+	            //system.out.println("Host:");
+	            //system.out.println("	"+rootObject.get("host")+"\n");
+	            log.setHost(rootObject.get("host").toString());													//9th field
+	
+	            //printing ip address
+	            //system.out.println("IP:");
+	            //system.out.println("	"+rootObject.get("ip")+"\n");
+	            log.setIp(rootObject.get("ip").toString());														//10th field
+	
+	            //printing page
+	            //system.out.println("Page:");
+	            //system.out.println("	"+rootObject.get("page")+"\n");
+	            log.setPage(rootObject.get("page").toString());													//11th field
+	
+	            //printing time
+	            //system.out.println("Time:");
+	            //system.out.println("	"+rootObject.get("time")+"\n");
+	            String time = rootObject.get("time").toString();
+	            
+	            //converting into date format
+	            String time2=time.substring(0, 10);
+	            //system.out.println("********"+time2+"***********");
+	            time2=time2.concat(" ");
+	            //system.out.println("********"+time2+"***********");
+	            time2=time2.concat(time.substring(11,19));
+	            //system.out.println("********"+time2+"***********");
+	            log.setTime(time2);																				//12th field
+	            
+	            
+	            
+	            //printing username
+	            //system.out.println("username:");
+	            //system.out.println("	"+rootObject.get("username")+"\n");
+	            log.setUsername(rootObject.get("username").toString());											//13th field
+	            
+	            //System.out.println("************event "+rootObject.get("event"));
+	            
+	            if(0==9/* && log.getEvent_source().equals("browser")*/)
+	            {
+	            	//system.out.println("*********"+log.getEvent_source()+"************");
+		            //printing event
+		            JSONObject event = rootObject.getJSONObject("event");
+		            //system.out.println("Attempts:");
+		            //system.out.println("	"+event.get("attempts")+"\n");
+		            //system.out.println("Grade:");
+		            //system.out.println("	"+event.get("grade")+"\n");
+		     
+		            //system.out.println("Max Grade:");
+		            //system.out.println("	"+event.get("max_grade")+"\n");
+		            
+		            //printing correct
+		            JSONObject correct_map = event.getJSONObject("correct_map");
+		            //system.out.println("Number of questions");
+		            //system.out.println("	"+correct_map.length());
+	            	Iterator keys = correct_map.keys();
+	            	while(keys.hasNext())
+	            	{
+	            		String key = (String)keys.next();
+	            		//system.out.println("	"+key);
+	            		JSONObject correctness = correct_map.getJSONObject(key);
+	            		//system.out.println("	"+correctness.get("correctness"));
+	            		if(correctness.get("hint").toString().equals("null")||(correctness.get("hint")).toString().length()==0)
+	            		{
+	            			//system.out.println("	0");
+	            		}
+	            		else
+	            		{
+	            			//system.out.println("	"+correctness.get("hint"));
+	            		}
+	            	}
+
+	            	//printing success
+	            	//system.out.println("Success:");
+	            	//system.out.println("	"+event.get("success"));
+	            }
+	            if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("pause_video"))
+	            {
+	            	System.out.println("pausing video");
+	            }
+	            else if(log.getEvent_type().equals("play_video"))
+	            {
+	            	String event = rootObject.getString("event");
+	            	JSONObject eventObject = new JSONObject(event);
+	            	
+	            	System.out.println("playing video");
+	            }
+	            else if(log.getEvent_type().equals("seek_video"))
+	            {
+	            	System.out.println("seeking video");
+	            }
+	            else if(log.getEvent_type().equals("speed_change_video"))
+	            {
+	            	System.out.println("changing speed of the video");
+	            }
+	            else if(log.getEvent_type().equals("problem_graded"))
+	            {
+	            	System.out.println("problem is graded");
+	            }
+	            else if(log.getEvent_type().equals("problem_check"))
+	            {
+	            	System.out.println("problem checking");
+	            }
+	            else if(log.getEvent_type().equals("problem_show"))
+	            {
+	            	System.out.println("problem is showing");
+	            }
+	            else if(log.getEvent_type().equals("showanswer"))
+	            {
+	            	System.out.println("showing the answer");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	System.out.println("loading video");
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	
+	            }
+	            else if(log.getEvent_type().equals("load_video"))
+	            {
+	            	
+	            }
+            	//db.insertlogdata(log);
+            }
+            //db.getdata();
+        } catch (JSONException e) {
+            // JSON Parsing error
+            e.printStackTrace();
+        }
+    }
+}

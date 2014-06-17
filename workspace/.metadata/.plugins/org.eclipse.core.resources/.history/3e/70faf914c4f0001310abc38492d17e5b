@@ -1,0 +1,64 @@
+package file;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.BufferedReader;
+
+public class Reader {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Reader reader = new Reader();
+		reader.readfile();
+
+	}
+	
+	public void readfile()
+	{
+		String path="/home/sachin/workspace/file/src/file/foo.txt";
+		File flen=new File(path);
+		Long l=flen.length();
+		FileReader fr;
+		try {
+			Database db = new Database();
+			fr = new FileReader(path);
+			BufferedReader textReader = new BufferedReader(fr);
+			String line;
+			int linenum=db.getlinenum();
+			Long ol=db.getsize();
+			System.out.println(linenum);
+			try {
+				int i=1;
+				while((line=textReader.readLine())!=null)
+				{
+					if(i>linenum)
+					{
+						System.out.println(line);
+						linenum++;
+					}
+					i++;
+				}
+				System.out.println(db.insertlinenum(linenum)+" "+linenum);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			finally
+			{
+				try {
+					textReader.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+}

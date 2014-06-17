@@ -1,0 +1,21 @@
+package file;
+
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.BufferedReader;
+
+public class Reader {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Reader reader = new Reader();
+		reader.readfile();
+
+	}
+	
+	public void readfile()
+	{
+		
+	}
+
+}

@@ -1,0 +1,167 @@
+package json;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.zip.GZIPInputStream;
+
+public class Filehandler {
+	public void handlefile()
+	{
+		System.out.println("Entered into filehandler");
+		
+		File mydirectory = new File("/home/sachin/workspace/json/src/json/log");
+		
+		System.out.println(mydirectory.isDirectory());
+		
+		File names[] = mydirectory.listFiles();
+		Database db = new Database();
+		
+		//getting filelastmodified date
+		long lastmdate=db.getfilelastmodified();
+		
+		//creating arraylist to store new tar.gz files
+		ArrayList<File> left = new ArrayList<File>();
+		
+		//adding new files into the arraylist
+		for(int i=0;i<names.length;i++)
+		{
+			if(names[i].lastModified()>lastmdate&&names[i].toString().matches(".*gz$"))
+			{
+				left.add(names[i]);
+				System.out.println("got match: "+names[i].lastModified()+" "+names[i]);
+			}
+		}
+		//db.setfilelastmodified(names[4].lastModified());
+		
+		//using another two dimensional array to sort the files according to the date
+		long table[][] = new long[left.size()][2];
+		
+		//intializing two dimensional array
+		for(int i=0;i<left.size();i++)
+		{
+			table[i][0] = i;
+			table[i][1] = left.get(i).lastModified();
+			System.out.println(table[i][0]+" "+table[i][1]);
+		}
+		
+		//sorting according to the date
+		for (int c = 0; c <  left.size(); c++) 
+		{
+		   for (int d = 0; d < left.size() - c - 1; d++) 
+		   {
+			   if(table[d][1] > table[d+1][1])
+			   {
+				   long swap = table[d][0];
+				   table[d][0]=table[d+1][0];
+				   table[d+1][0]=swap;
+				   swap = table[d][1];
+				   table[d][1]=table[d+1][1];
+				   table[d+1][1]=swap;
+			   }
+		   }
+		}
+		
+		//reading from the file
+		//care has been taken that file which was archived i.e. which was
+		//partially read is not read completely again.
+		InputStream is=null;
+		boolean first=true;
+		String line;
+		LineParser lp = new LineParser();
+		for(int i=0;i<left.size();i++)
+		{
+			try
+			{
+				if(first)
+				{
+					//reading file which was archived which wasn't read completely
+					System.out.println("started reading file "+left.get((int) table[i][0]));
+					int linenum = db.getlinenum();
+					System.out.println("line count in file"+linenum);
+					is = new GZIPInputStream(new FileInputStream(left.get((int) table[i][0])));
+					/*Reader decoder = new InputStreamReader(is, "UTF-8");
+					BufferedReader buffered = new BufferedReader(decoder);
+					*/
+					BufferedReader buffered = new BufferedReader(new InputStreamReader(is));
+					int j=0;
+					/*char c ;
+					System.out.println("***************************");
+					while(is.available()==1)
+					{
+						System.out.print((char)is.read());
+					}
+					System.out.println("******************************");
+					System.out.println("******************************");
+					System.out.println("******************************");
+					System.out.println("******************************");
+					System.out.println("******************************");
+					System.out.println("******************************");
+					
+					while((line=buffered.readLine())!=null)
+					{
+						System.out.println(line);
+						j++;
+						System.out.println("The value of the j is "+j);
+						//lp.parseline(line);
+					}
+					*/
+					while((line=buffered.readLine())!=null)
+					{
+						System.out.println(line);
+						j++;
+						System.out.println("The value of the j is "+j);
+						//lp.parseline(line);
+					}
+					while(j<linenum)
+					{
+						if((line=buffered.readLine())!=null)
+						{
+							j++;
+							System.out.println("The value of the j is "+j);
+							System.out.println
+							System.out.println(line);
+						}
+					}
+					while((line=buffered.readLine())!=null)
+					{
+						System.out.println(line);
+						//lp.parseline(line);
+					}*/
+					buffered.close();
+					first=false;
+					//db.setfilelastmodified(left.get((int) table[i][0]).lastModified());
+				}
+				else
+				{
+
+					System.out.println("started reading file "+left.get((int) table[i][0]));
+					is = new GZIPInputStream(new FileInputStream(left.get((int) table[i][0])));
+					Reader decoder = new InputStreamReader(is, "UTF-8");
+					BufferedReader buffered = new BufferedReader(decoder);
+					while((line=buffered.readLine())!=null)
+					{
+						//lp.parseline(line);
+						System.out.println(line);
+					}
+					buffered.close();
+					//db.setfilelastmodified(left.get((int) table[i][0]).lastModified());
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("error while reading tar.gz files"+left.get((int) table[i][0]));
+			}
+		}
+		//db.setfilelastmodified(0);
+		//db.setsize(0);
+		//db.insertlinenum(0);
+	}
+}

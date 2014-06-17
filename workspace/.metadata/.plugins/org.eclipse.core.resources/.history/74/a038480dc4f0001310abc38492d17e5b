@@ -1,0 +1,100 @@
+package file;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+
+public class Database
+{
+	private Connection connect = null;
+	private Statement statement = null;
+	private PreparedStatement preparedStatement = null;
+	private ResultSet resultSet = null;
+	
+	//constructor for this class to get connection
+
+	
+	//to get the all the data
+	public int getlinenum()
+	{
+		int lines=-1;
+		try
+		{
+			connect = Connect.GetConnection();
+			statement = connect.createStatement();
+			resultSet = statement.executeQuery("select line from status");
+			while(resultSet.next())
+			{
+				System.out.println("id "+resultSet.getInt("line"));
+				lines=resultSet.getInt("line");
+			}
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex);
+		}
+		finally
+		{
+			try {
+				connect.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return lines;
+	}
+	public int insertlinenum(int linenum)
+	{
+		int success = 0; 
+		try
+		{
+			connect = Connect.GetConnection();
+			statement = connect.createStatement();
+			preparedStatement = connect.prepareStatement("update status set line="+linenum+"  ");
+			success = preparedStatement.executeUpdate();
+			
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex);
+			System.out.println("got the first error");
+		}
+		finally
+		{
+			try
+			{
+				connect.close();
+			} 
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+				System.out.println("got the second error");
+			}
+		}
+		return success;
+	}
+	public String todatetime(String date)
+	{
+        String time2=date.substring(0, 10);
+        time2=time2.concat(" ");
+        time2=time2.concat(date.substring(11,19));
+        return time2;	
+	}
+	public String totime(String date)
+	{
+        String time2=date.substring(11,19);
+        return time2;	
+	}
+}

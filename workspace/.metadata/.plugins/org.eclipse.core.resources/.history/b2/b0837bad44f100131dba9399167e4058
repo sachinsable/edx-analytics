@@ -1,0 +1,10 @@
+package json;
+
+public class LineParser {
+	public int parseline(String line)
+	{
+		int success=0;
+		return success;
+	}
+
+}
