@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Copy 0 elements to &apos;file.Connect.java&apos;&#x0A;- Destination element: &apos;file.Connect.java&apos;" description="Copy compilation units" destination="=file/src&lt;file{Connect.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1402401595271" units="0" version="1.0"/>
-</session>
